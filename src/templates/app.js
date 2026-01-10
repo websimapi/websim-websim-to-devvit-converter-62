@@ -316,34 +316,39 @@ router.get('/api/comments', async (req, res) => {
 });
 
 router.post('/api/comments', async (req, res) => {
+    console.log('[Server] API Post Comment Request Received');
     try {
         const { content, parentId } = req.body;
         const postId = context.postId;
+        const userId = context.userId;
         
-        if (!postId) return res.status(400).json({ error: 'No Post Context' });
+        console.log(\`[Server] Comment Params: parent=\${parentId}, post=\${postId}, user=\${userId}\`);
+
+        if (!postId) {
+            console.error('[Server] Comment failed: context.postId is missing');
+            return res.status(400).json({ error: 'Post context missing on server' });
+        }
         
         const text = typeof content === 'string' ? content : '';
         if (!text.trim()) {
             return res.status(400).json({ error: 'Comment content cannot be empty' });
         }
 
-        // Use User Actions to post as the authenticated user
-        // We use 'id' which covers both top-level posts and comments
         const targetId = parentId || postId;
+        console.log(\`[Server] Submitting comment to target: \${targetId}\`);
 
-        console.log(\`[Server] submitComment: id=\${targetId} text_len=\${text.length}\`);
-
-        // [Fixed] Post as user using runAs: 'USER'
-        // Requires "permissions": { "reddit": { "asUser": ["SUBMIT_COMMENT"] } } in devvit.json
+        // Post as user using runAs: 'USER'
+        // Note: This requires the "asUser": ["SUBMIT_COMMENT"] permission in devvit.json
         const result = await reddit.submitComment({
             id: targetId,
             text: text,
             runAs: 'USER'
         });
 
+        console.log(\`[Server] Comment successfully posted! ID: \${result.id}\`);
         res.json({ success: true, id: result.id });
     } catch (e) {
-        console.error('Post Comment Error:', e);
+        console.error('[Server] Post Comment Error:', e);
         res.status(500).json({ error: e.message });
     }
 });
