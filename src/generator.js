@@ -278,6 +278,25 @@ export default {
             { "sku": "tip_100_gold", "displayName": "Platinum Tip (100 Gold)", "price": 100, "metadata": { "credits": "100", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "products/tip_100.png" } }
         ]
     }, null, 2));
+
+    // [Assets] Generate Placeholder Product Images
+    // Devvit CLI requires these images to exist in the /assets/ directory
+    const assetsFolder = zip.folder("assets");
+    const productsFolder = assetsFolder.folder("products");
+    
+    // 1x1 Transparent PNG
+    const PLACEHOLDER_PNG = new Uint8Array([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+      0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4,
+      0x89, 0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
+      0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae,
+      0x42, 0x60, 0x82
+    ]);
+
+    productsFolder.file("tip_5.png", PLACEHOLDER_PNG);
+    productsFolder.file("tip_25.png", PLACEHOLDER_PNG);
+    productsFolder.file("tip_50.png", PLACEHOLDER_PNG);
+    productsFolder.file("tip_100.png", PLACEHOLDER_PNG);
     zip.file(".gitignore", "node_modules\n.devvit\ndist"); 
 
     if (includeReadme) {
