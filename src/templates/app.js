@@ -1,5 +1,6 @@
 export const getMainTs = (title) => {
-    const safeTitle = title.replace(/'/g, "\\'");
+    // Escape backslashes first, then quotes to prevent breaking the string
+    const safeTitle = title.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     return `
 import express from 'express';
 import { Devvit } from '@devvit/public-api';
@@ -175,7 +176,7 @@ router.post('/internal/payments/fulfill', async (req, res) => {
             const sku = product ? product.sku : '';
             
             // SKU format: tip_25_gold
-            const match = sku.match(/tip_(\d+)_gold/);
+            const match = sku.match(/tip_(\\d+)_gold/);
             const amount = match ? parseInt(match[1]) : 0;
             
             // Context availability check
