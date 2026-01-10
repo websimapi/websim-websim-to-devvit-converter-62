@@ -183,19 +183,19 @@ router.post('/api/payments/fulfill', async (req, res) => {
             const postId = context.postId;
 
             if (amount > 0 && userId && postId) {
-                console.log(`[Payment] Processing tip: ${amount} gold from ${userId} on ${postId}`);
+                console.log(\`[Payment] Processing tip: \${amount} gold from \${userId} on \${postId}\`);
                 
-                const tipKey = `tips:${postId}:${userId}`;
+                const tipKey = \`tips:\${postId}:\${userId}\`;
                 await redis.incrBy(tipKey, amount);
                 
                 // Automated Thank You Comment
                 try {
                     const comment = await reddit.submitComment({
                         id: postId,
-                        text: `**Tipped ${amount} Gold!** 🟡\n\n*(Automated via Devvit Payments)*`
+                        text: \`**Tipped \${amount} Gold!** 🟡\\n\\n*(Automated via Devvit Payments)*\`
                     });
                     
-                    const metaKey = `comment_metadata:${comment.id}`;
+                    const metaKey = \`comment_metadata:\${comment.id}\`;
                     await redis.hSet(metaKey, {
                         type: 'tip_comment',
                         credits_spent: String(amount)
