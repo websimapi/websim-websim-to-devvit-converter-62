@@ -50,6 +50,7 @@ export const generateDevvitJson = (slug, entrypoints) => JSON.stringify({
   "server": {
     "entry": "index.cjs"
   },
+  "media": "assets",
   "payments": {
     "productsFile": "products.json",
     "endpoints": {

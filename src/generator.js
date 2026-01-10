@@ -297,6 +297,10 @@ export default {
     productsFolder.file("tip_25.png", PLACEHOLDER_PNG);
     productsFolder.file("tip_50.png", PLACEHOLDER_PNG);
     productsFolder.file("tip_100.png", PLACEHOLDER_PNG);
+    
+    // Add a readme to ensure folder is tracked and user knows what this is
+    productsFolder.file("README.txt", "These images are required by Devvit Payments. They are referenced in products.json.");
+
     zip.file(".gitignore", "node_modules\n.devvit\ndist"); 
 
     if (includeReadme) {
