@@ -123,7 +123,7 @@ export default defineConfig({
   assetsInclude: ['**/*.mp3', '**/*.wav', '**/*.ogg', '**/*.glb', '**/*.gltf', '**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif'],
   esbuild: {
     loader: 'jsx',
-    include: /\\.(js|jsx|ts|tsx)$/, // regex fix
+    include: /\.(js|jsx|ts|tsx)$/, // regex fix
     exclude: [],
     legalComments: 'none', 
   },

@@ -34,23 +34,6 @@ if (!fs.existsSync(SERVER_BUILD)) {
     console.log('✅ Server build found at dist/server/index.cjs');
 }
 
-console.log('🔍 Verifying Project Structure...');
-
-// Check for Assets Folder (Devvit Requirement for Payments)
-if (!fs.existsSync('./assets')) {
-     console.warn('⚠️  Missing "assets" folder. Payment images might fail to upload.');
-} else {
-    // Validate required payment images exist
-    const requiredImages = ['tip_5.png', 'tip_25.png', 'tip_50.png', 'tip_100.png'];
-    const missing = requiredImages.filter(img => !fs.existsSync(`./assets/products/${img}`));
-    if (missing.length > 0) {
-         console.warn(`⚠️  Missing payment images in assets/products/: ${missing.join(', ')}`);
-         console.warn('   The Devvit CLI will likely reject the bundle.');
-    } else {
-        console.log('✅ Payment assets verified.');
-    }
-}
-
 console.log('🔍 Verifying Webroot Integrity...');
 
 if (!fs.existsSync(WEBROOT)) {

@@ -279,12 +279,12 @@ export default {
         ]
     }, null, 2));
 
-    // [Assets] Generate Placeholder Product Images
+    // [Assets] Generate Product Images (with Hot-swap support)
     // Devvit CLI requires these images to exist in the /assets/ directory
     const assetsFolder = zip.folder("assets");
     const productsFolder = assetsFolder.folder("products");
     
-    // 1x1 Transparent PNG
+    // 1x1 Transparent PNG (Fallback)
     const PLACEHOLDER_PNG = new Uint8Array([
       0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4,
@@ -293,14 +293,23 @@ export default {
       0x42, 0x60, 0x82
     ]);
 
-    productsFolder.file("tip_5.png", PLACEHOLDER_PNG);
-    productsFolder.file("tip_25.png", PLACEHOLDER_PNG);
-    productsFolder.file("tip_50.png", PLACEHOLDER_PNG);
-    productsFolder.file("tip_100.png", PLACEHOLDER_PNG);
-    
-    // Add a readme to ensure folder is tracked and user knows what this is
-    productsFolder.file("README.txt", "These images are required by Devvit Payments. They are referenced in products.json.");
+    // Helper: Find asset by filename (case-insensitive) to allow hotswap from user upload
+    const getHotswapImage = (filename) => {
+        const target = filename.toLowerCase();
+        // 1. Exact match in processed assets
+        for (const [path, content] of Object.entries(assets)) {
+            if (path.toLowerCase().endsWith(target)) {
+                console.log(`[Generator] Hotswapped product image: ${filename} -> ${path}`);
+                return content;
+            }
+        }
+        return PLACEHOLDER_PNG;
+    };
 
+    productsFolder.file("tip_5.png", getHotswapImage("tip_5.png"));
+    productsFolder.file("tip_25.png", getHotswapImage("tip_25.png"));
+    productsFolder.file("tip_50.png", getHotswapImage("tip_50.png"));
+    productsFolder.file("tip_100.png", getHotswapImage("tip_100.png"));
     zip.file(".gitignore", "node_modules\n.devvit\ndist"); 
 
     if (includeReadme) {
