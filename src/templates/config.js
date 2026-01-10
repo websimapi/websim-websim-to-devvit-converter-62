@@ -52,7 +52,10 @@ export const generateDevvitJson = (slug, entrypoints) => JSON.stringify({
   },
   "payments": {
     "productsFile": "products.json",
-    "fulfillmentUrl": "/api/payments/fulfill"
+    "endpoints": {
+      "fulfillOrder": "/api/internal/fulfill-payment",
+      "refundOrder": "/api/internal/refund-payment"
+    }
   },
   "permissions": {
     "redis": true,

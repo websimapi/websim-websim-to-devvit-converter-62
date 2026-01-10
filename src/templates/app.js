@@ -163,7 +163,7 @@ router.post('/api/delete', async (req, res) => {
 });
 
 // --- Payments Fulfillment Endpoint ---
-router.post('/api/payments/fulfill', async (req, res) => {
+router.post('/api/internal/fulfill-payment', async (req, res) => {
     console.log('[Server] Fulfillment Request Received');
     try {
         const event = req.body; 
@@ -216,6 +216,12 @@ router.post('/api/payments/fulfill', async (req, res) => {
         // but typically 500 is appropriate for actual crashes. 
         res.status(500).json({ error: e.message });
     }
+});
+
+router.post('/api/internal/refund-payment', async (req, res) => {
+    console.log('[Server] Refund Request Received');
+    // Refunds are automatic, but we should acknowledge
+    res.json({ success: true });
 });
 
 // --- Realtime Relay (Client -> Server -> Clients) ---
