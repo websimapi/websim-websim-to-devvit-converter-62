@@ -50,7 +50,6 @@ export const generateDevvitJson = (slug, entrypoints) => JSON.stringify({
   "server": {
     "entry": "index.cjs"
   },
-  "media": "assets",
   "payments": {
     "productsFile": "products.json",
     "endpoints": {
@@ -69,6 +68,9 @@ export const generateDevvitJson = (slug, entrypoints) => JSON.stringify({
   },
   "triggers": {
     "onAppInstall": "/internal/onInstall"
+  },
+  "media": {
+    "dir": "assets"
   },
   "menu": {
     "items": [

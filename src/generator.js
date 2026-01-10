@@ -269,22 +269,23 @@ export default {
     zip.file("devvit.json", generateDevvitJson(projectSlug, entrypoints));
     zip.file("tsconfig.json", tsConfig);
     // [Fixed] Products now align with Devvit Gold standards (5, 25, 50)
+    // [Fixed] Products now align with Devvit Gold standards (5, 25, 50, 100)
+    // We flatten the icon paths to ensure the Devvit CLI reliably finds them in the assets directory
     zip.file("products.json", JSON.stringify({
         "$schema": "https://developers.reddit.com/schema/products.json",
         "products": [
-            { "sku": "tip_5_gold", "displayName": "Bronze Tip (5 Gold)", "price": 5, "metadata": { "credits": "5", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "products/tip_5.png" } },
-            { "sku": "tip_25_gold", "displayName": "Silver Tip (25 Gold)", "price": 25, "metadata": { "credits": "25", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "products/tip_25.png" } },
-            { "sku": "tip_50_gold", "displayName": "Gold Tip (50 Gold)", "price": 50, "metadata": { "credits": "50", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "products/tip_50.png" } },
-            { "sku": "tip_100_gold", "displayName": "Platinum Tip (100 Gold)", "price": 100, "metadata": { "credits": "100", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "products/tip_100.png" } }
+            { "sku": "tip_5_gold", "displayName": "Bronze Tip (5 Gold)", "price": 5, "metadata": { "credits": "5", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_5.png" } },
+            { "sku": "tip_25_gold", "displayName": "Silver Tip (25 Gold)", "price": 25, "metadata": { "credits": "25", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_25.png" } },
+            { "sku": "tip_50_gold", "displayName": "Gold Tip (50 Gold)", "price": 50, "metadata": { "credits": "50", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_50.png" } },
+            { "sku": "tip_100_gold", "displayName": "Platinum Tip (100 Gold)", "price": 100, "metadata": { "credits": "100", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_100.png" } }
         ]
     }, null, 2));
 
-    // [Assets] Generate Product Images (with Hot-swap support)
+    // [Assets] Generate Placeholder Product Images
     // Devvit CLI requires these images to exist in the /assets/ directory
     const assetsFolder = zip.folder("assets");
-    const productsFolder = assetsFolder.folder("products");
     
-    // 1x1 Transparent PNG (Fallback)
+    // 1x1 Transparent PNG
     const PLACEHOLDER_PNG = new Uint8Array([
       0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4,
@@ -293,23 +294,10 @@ export default {
       0x42, 0x60, 0x82
     ]);
 
-    // Helper: Find asset by filename (case-insensitive) to allow hotswap from user upload
-    const getHotswapImage = (filename) => {
-        const target = filename.toLowerCase();
-        // 1. Exact match in processed assets
-        for (const [path, content] of Object.entries(assets)) {
-            if (path.toLowerCase().endsWith(target)) {
-                console.log(`[Generator] Hotswapped product image: ${filename} -> ${path}`);
-                return content;
-            }
-        }
-        return PLACEHOLDER_PNG;
-    };
-
-    productsFolder.file("tip_5.png", getHotswapImage("tip_5.png"));
-    productsFolder.file("tip_25.png", getHotswapImage("tip_25.png"));
-    productsFolder.file("tip_50.png", getHotswapImage("tip_50.png"));
-    productsFolder.file("tip_100.png", getHotswapImage("tip_100.png"));
+    assetsFolder.file("tip_5.png", PLACEHOLDER_PNG);
+    assetsFolder.file("tip_25.png", PLACEHOLDER_PNG);
+    assetsFolder.file("tip_50.png", PLACEHOLDER_PNG);
+    assetsFolder.file("tip_100.png", PLACEHOLDER_PNG);
     zip.file(".gitignore", "node_modules\n.devvit\ndist"); 
 
     if (includeReadme) {
