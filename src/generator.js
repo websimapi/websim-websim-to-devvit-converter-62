@@ -268,36 +268,50 @@ export default {
     zip.file("package.json", generatePackageJson(projectSlug, analyzer.dependencies, extraDevDeps));
     zip.file("devvit.json", generateDevvitJson(projectSlug, entrypoints));
     zip.file("tsconfig.json", tsConfig);
-    // [Fixed] Products now align with Devvit Gold standards (5, 25, 50)
-    // [Fixed] Products now align with Devvit Gold standards (5, 25, 50, 100)
-    // We flatten the icon paths to ensure the Devvit CLI reliably finds them in the assets directory
+    // [Fixed] Products align with official Reddit Gold tiers
+    // Using 256x256 icons to meet Devvit validation requirements
+    const productList = [
+        { sku: "tip_5_gold", display: "Bronze Tip", price: 5 },
+        { sku: "tip_25_gold", display: "Silver Tip", price: 25 },
+        { sku: "tip_50_gold", display: "Gold Tip", price: 50 },
+        { sku: "tip_100_gold", display: "Platinum Tip", price: 100 },
+        { sku: "tip_150_gold", display: "Diamond Tip", price: 150 },
+        { sku: "tip_250_gold", display: "Emerald Tip", price: 250 },
+        { sku: "tip_500_gold", display: "Ruby Tip", price: 500 },
+        { sku: "tip_1000_gold", display: "Master Tip", price: 1000 },
+        { sku: "tip_2500_gold", display: "Legend Tip", price: 2500 }
+    ].map(p => ({
+        sku: p.sku,
+        displayName: `${p.display} (${p.price} Gold)`,
+        price: p.price,
+        metadata: { credits: String(p.price), category: "tip" },
+        accountingType: "INSTANT",
+        images: { icon: `tip_${p.price}.png` }
+    }));
+
     zip.file("products.json", JSON.stringify({
         "$schema": "https://developers.reddit.com/schema/products.json",
-        "products": [
-            { "sku": "tip_5_gold", "displayName": "Bronze Tip (5 Gold)", "price": 5, "metadata": { "credits": "5", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_5.png" } },
-            { "sku": "tip_25_gold", "displayName": "Silver Tip (25 Gold)", "price": 25, "metadata": { "credits": "25", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_25.png" } },
-            { "sku": "tip_50_gold", "displayName": "Gold Tip (50 Gold)", "price": 50, "metadata": { "credits": "50", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_50.png" } },
-            { "sku": "tip_100_gold", "displayName": "Platinum Tip (100 Gold)", "price": 100, "metadata": { "credits": "100", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_100.png" } }
-        ]
+        "products": productList
     }, null, 2));
 
     // [Assets] Generate Placeholder Product Images
-    // Devvit CLI requires these images to exist in the /assets/ directory
+    // Devvit CLI requires these images to exist in the /assets/ directory and be at least 256x256
     const assetsFolder = zip.folder("assets");
     
-    // 1x1 Transparent PNG
-    const PLACEHOLDER_PNG = new Uint8Array([
-      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
-      0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4,
-      0x89, 0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
-      0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae,
-      0x42, 0x60, 0x82
-    ]);
+    // Base64 to Uint8Array helper
+    const b64ToBin = (b64) => {
+        const bin = atob(b64);
+        const arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        return arr;
+    };
 
-    assetsFolder.file("tip_5.png", PLACEHOLDER_PNG);
-    assetsFolder.file("tip_25.png", PLACEHOLDER_PNG);
-    assetsFolder.file("tip_50.png", PLACEHOLDER_PNG);
-    assetsFolder.file("tip_100.png", PLACEHOLDER_PNG);
+    // 256x256 Transparent PNG (Minimal)
+    const PLACEHOLDER_256_PNG = b64ToBin("iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAAQMAAABmvDolAAAAA1BMVEX///+nxBvIAAAAAXRSTlMAQObYZgAAAAxJREFUeNpjYBgFoBAAAAGAAAH6968ZAAAAAElFTkSuQmCC");
+
+    // Standard Reddit Gold Tiers
+    const tiers = [5, 25, 50, 100, 150, 250, 500, 1000, 2500];
+    tiers.forEach(t => assetsFolder.file(`tip_${t}.png`, PLACEHOLDER_256_PNG));
     zip.file(".gitignore", "node_modules\n.devvit\ndist"); 
 
     if (includeReadme) {
