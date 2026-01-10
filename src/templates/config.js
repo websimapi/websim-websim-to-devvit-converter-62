@@ -53,8 +53,8 @@ export const generateDevvitJson = (slug, entrypoints) => JSON.stringify({
   "payments": {
     "productsFile": "products.json",
     "endpoints": {
-      "fulfillOrder": "/api/internal/fulfill-payment",
-      "refundOrder": "/api/internal/refund-payment"
+      "fulfillOrder": "/internal/payments/fulfill",
+      "refundOrder": "/internal/payments/refund"
     }
   },
   "permissions": {

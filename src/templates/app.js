@@ -163,7 +163,7 @@ router.post('/api/delete', async (req, res) => {
 });
 
 // --- Payments Fulfillment Endpoint ---
-router.post('/api/internal/fulfill-payment', async (req, res) => {
+router.post('/internal/payments/fulfill', async (req, res) => {
     console.log('[Server] Fulfillment Request Received');
     try {
         const event = req.body; 
@@ -218,7 +218,7 @@ router.post('/api/internal/fulfill-payment', async (req, res) => {
     }
 });
 
-router.post('/api/internal/refund-payment', async (req, res) => {
+router.post('/internal/payments/refund', async (req, res) => {
     console.log('[Server] Refund Request Received');
     // Refunds are automatic, but we should acknowledge
     res.json({ success: true });
