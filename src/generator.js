@@ -268,50 +268,73 @@ export default {
     zip.file("package.json", generatePackageJson(projectSlug, analyzer.dependencies, extraDevDeps));
     zip.file("devvit.json", generateDevvitJson(projectSlug, entrypoints));
     zip.file("tsconfig.json", tsConfig);
-    // [Fixed] Products align with official Reddit Gold tiers
-    // Using 256x256 icons to meet Devvit validation requirements
-    const productList = [
-        { sku: "tip_5_gold", display: "Bronze Tip", price: 5 },
-        { sku: "tip_25_gold", display: "Silver Tip", price: 25 },
-        { sku: "tip_50_gold", display: "Gold Tip", price: 50 },
-        { sku: "tip_100_gold", display: "Platinum Tip", price: 100 },
-        { sku: "tip_150_gold", display: "Diamond Tip", price: 150 },
-        { sku: "tip_250_gold", display: "Emerald Tip", price: 250 },
-        { sku: "tip_500_gold", display: "Ruby Tip", price: 500 },
-        { sku: "tip_1000_gold", display: "Master Tip", price: 1000 },
-        { sku: "tip_2500_gold", display: "Legend Tip", price: 2500 }
-    ].map(p => ({
-        sku: p.sku,
-        displayName: `${p.display} (${p.price} Gold)`,
-        price: p.price,
-        metadata: { credits: String(p.price), category: "tip" },
-        accountingType: "INSTANT",
-        images: { icon: `tip_${p.price}.png` }
-    }));
-
+    // [Fixed] Products now align with Devvit Gold standards (5, 25, 50, 100, 500, 1000)
+    // Dynamic tiers for tips to support various contribution levels
     zip.file("products.json", JSON.stringify({
         "$schema": "https://developers.reddit.com/schema/products.json",
-        "products": productList
+        "products": [
+            { "sku": "tip_5_gold", "displayName": "Bronze Tip", "price": 5, "metadata": { "credits": "5", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_5.png" } },
+            { "sku": "tip_25_gold", "displayName": "Silver Tip", "price": 25, "metadata": { "credits": "25", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_25.png" } },
+            { "sku": "tip_50_gold", "displayName": "Gold Tip", "price": 50, "metadata": { "credits": "50", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_50.png" } },
+            { "sku": "tip_100_gold", "displayName": "Platinum Tip", "price": 100, "metadata": { "credits": "100", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_100.png" } },
+            { "sku": "tip_500_gold", "displayName": "Diamond Tip", "price": 500, "metadata": { "credits": "500", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_500.png" } },
+            { "sku": "tip_1000_gold", "displayName": "Legendary Tip", "price": 1000, "metadata": { "credits": "1000", "category": "tip" }, "accountingType": "INSTANT", "images": { "icon": "tip_1000.png" } }
+        ]
     }, null, 2));
 
-    // [Assets] Generate Placeholder Product Images
-    // Devvit CLI requires these images to exist in the /assets/ directory and be at least 256x256
+    // [Assets] Generate High-Resolution Placeholder Product Images
+    // Reddit strictly requires product icons to be at least 256x256px
     const assetsFolder = zip.folder("assets");
     
-    // Base64 to Uint8Array helper
-    const b64ToBin = (b64) => {
-        const bin = atob(b64);
-        const arr = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-        return arr;
+    const generateTipIcon = (color, text) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        
+        // Background Glow
+        const grad = ctx.createRadialGradient(128, 128, 50, 128, 128, 128);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, '#0f172a'); // App background color
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 256, 256);
+        
+        // Gold Coin Base
+        ctx.beginPath();
+        ctx.arc(128, 128, 90, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFD700';
+        ctx.fill();
+        ctx.strokeStyle = '#B8860B';
+        ctx.lineWidth = 12;
+        ctx.stroke();
+        
+        // Inner detail
+        ctx.beginPath();
+        ctx.arc(128, 128, 70, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        // Text
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 90px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, 128, 128);
+
+        const dataUrl = canvas.toDataURL('image/png');
+        const binary = atob(dataUrl.split(',')[1]);
+        const array = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
+        return array;
     };
 
-    // 256x256 Transparent PNG (Minimal)
-    const PLACEHOLDER_256_PNG = b64ToBin("iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAAQMAAABmvDolAAAAA1BMVEX///+nxBvIAAAAAXRSTlMAQObYZgAAAAxJREFUeNpjYBgFoBAAAAGAAAH6968ZAAAAAElFTkSuQmCC");
-
-    // Standard Reddit Gold Tiers
-    const tiers = [5, 25, 50, 100, 150, 250, 500, 1000, 2500];
-    tiers.forEach(t => assetsFolder.file(`tip_${t}.png`, PLACEHOLDER_256_PNG));
+    assetsFolder.file("tip_5.png", generateTipIcon('#CD7F32', '5'));
+    assetsFolder.file("tip_25.png", generateTipIcon('#C0C0C0', '25'));
+    assetsFolder.file("tip_50.png", generateTipIcon('#FFD700', '50'));
+    assetsFolder.file("tip_100.png", generateTipIcon('#E5E4E2', '100'));
+    assetsFolder.file("tip_500.png", generateTipIcon('#00FFFF', '500'));
+    assetsFolder.file("tip_1000.png", generateTipIcon('#FF00FF', '1K'));
     zip.file(".gitignore", "node_modules\n.devvit\ndist"); 
 
     if (includeReadme) {

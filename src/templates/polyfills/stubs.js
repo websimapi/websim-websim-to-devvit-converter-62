@@ -78,13 +78,14 @@ export const websimStubsJs = `
                     let innerHtml = '';
                     
                     if (isTip) {
-                        // Map arbitrary credits to available Gold Tiers
-                        // Tiers: 5, 25, 50, 100, 150, 250, 500, 1000, 2500
-                        const tiers = [5, 25, 50, 100, 150, 250, 500, 1000, 2500];
+                        // Map arbitrary credits to Gold Products (5, 25, 50, 100, 500, 1000)
+                        let goldPrice = 5;
                         const req = data.credits || 0;
-                        
-                        // Find closest tier (rounding up to ensure developer gets enough)
-                        let goldPrice = tiers.find(t => t >= req) || tiers[tiers.length - 1];
+                        if (req >= 750) goldPrice = 1000;
+                        else if (req >= 300) goldPrice = 500;
+                        else if (req >= 75) goldPrice = 100;
+                        else if (req >= 35) goldPrice = 50;
+                        else if (req >= 15) goldPrice = 25;
                         
                         innerHtml = \`
                             <div style="background:#1e293b;padding:24px;border-radius:12px;width:90%;max-width:400px;text-align:center;border:1px solid #334155;">
